@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korean Number Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --paper: #f5f0e8;
+    --red: #c0392b;
+    --gold: #b8860b;
+    --muted: #8a7f72;
+    --border: #d4c9b8;
+    --green: #2e7d52;
+    --green-bg: #f0f7f3;
+    --red-light: #fdf1f0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: 'DM Mono', monospace; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 40px 20px 80px;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(180,160,130,0.15) 31px, rgba(180,160,130,0.15) 32px);
+  }
+  header { text-align: center; margin-bottom: 32px; }
+  header h1 { font-family: 'Gowun Batang', serif; font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: 0.02em; line-height: 1.2; }
+  header h1 span { color: var(--red); }
+  header p { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 8px; }
+  .divider { width: 120px; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); margin: 14px auto; }
+
+  /* ── Top nav ── */
+  .top-mode-bar { display: flex; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 28px; width: 100%; max-width: 900px; }
+  .top-mode-btn { flex: 1; padding: 10px 8px; font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; background: transparent; border: none; cursor: pointer; color: var(--muted); transition: all 0.2s; line-height: 1.7; }
+  .top-mode-btn .ko { font-family: 'Gowun Batang', serif; font-size: 1rem; display: block; color: var(--ink); }
+  .top-mode-btn.active { background: var(--ink); color: var(--paper); }
+  .top-mode-btn.active .ko { color: var(--paper); }
+  .top-mode-btn:not(:last-child) { border-right: 1px solid var(--border); }
+
+  /* ── Shared panel ── */
+  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; max-width: 900px; }
+  @media (max-width: 660px) { .panels { grid-template-columns: 1fr; } }
+  .panel { background: #faf7f2; border: 1px solid var(--border); border-radius: 2px; padding: 26px 22px; position: relative; box-shadow: 3px 3px 0 rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 16px; }
+  .panel::before { content: ''; position: absolute; top: 6px; left: 6px; right: -6px; bottom: -6px; border: 1px solid var(--border); border-radius: 2px; z-index: -1; opacity: 0.5; }
+  .panel-title { font-family: 'Gowun Batang', serif; font-size: 1.2rem; font-weight: 700; display: flex; flex-direction: column; gap: 2px; }
+  .panel-title .korean-title { color: var(--red); font-size: 0.95rem; font-weight: 400; }
+  .panel-title .range { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.1em; font-weight: 400; }
+  .field-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .toggle-group { display: flex; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+  .toggle-btn { flex: 1; padding: 8px 4px; font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; border: none; cursor: pointer; color: var(--muted); transition: all 0.2s; }
+  .toggle-btn.active { background: var(--ink); color: var(--paper); }
+  .toggle-btn:not(:last-child) { border-right: 1px solid var(--border); }
+  .cap-row { display: flex; align-items: center; gap: 8px; }
+  .cap-row-label { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); flex: 1; }
+  .pill-label { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .pill-label input { display: none; }
+  .pill { width: 34px; height: 18px; background: var(--border); border-radius: 20px; position: relative; transition: background 0.2s; flex-shrink: 0; }
+  .pill::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: transform 0.2s; }
+  .pill-label input:checked + .pill { background: var(--gold); }
+  .pill-label input:checked + .pill::after { transform: translateX(16px); }
+  .gen-btn { width: 100%; padding: 12px; font-family: 'Gowun Batang', serif; font-size: 1rem; background: var(--red); color: white; border: none; border-radius: 1px; cursor: pointer; letter-spacing: 0.05em; transition: all 0.15s; box-shadow: 2px 2px 0 rgba(192,57,43,0.3); }
+  .gen-btn:hover { background: #a93226; transform: translate(-1px,-1px); box-shadow: 3px 3px 0 rgba(192,57,43,0.3); }
+  .gen-btn:active { transform: translate(1px,1px); box-shadow: none; }
+  .display-area { min-height: 88px; border: 1px dashed var(--border); border-radius: 1px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px 16px; background: rgba(255,255,255,0.4); gap: 4px; }
+  .display-number { font-family: 'Gowun Batang', serif; font-size: clamp(1.6rem, 3.8vw, 2.4rem); text-align: center; line-height: 1.3; opacity: 0; transform: translateY(8px); transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); word-break: keep-all; }
+  .display-number.visible { opacity: 1; transform: translateY(0); }
+  .display-sub { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em; opacity: 0; transition: opacity 0.3s 0.15s; text-align: center; }
+  .display-sub.visible { opacity: 1; }
+  .placeholder-text { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+  .guess-section { display: flex; flex-direction: column; gap: 6px; }
+  .guess-row { display: flex; gap: 6px; }
+  .guess-input { flex: 1; padding: 9px 12px; font-family: 'Gowun Batang', serif; font-size: 1rem; background: white; border: 1px solid var(--border); border-radius: 1px; color: var(--ink); outline: none; transition: border-color 0.2s, background 0.2s; }
+  .guess-input:focus { border-color: var(--gold); }
+  .guess-input.correct { border-color: var(--green); background: var(--green-bg); }
+  .guess-input.wrong   { border-color: var(--red);   background: var(--red-light); }
+  .check-btn { padding: 9px 13px; font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; background: var(--ink); color: var(--paper); border: none; border-radius: 1px; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
+  .check-btn:hover { opacity: 0.75; }
+  .guess-feedback { font-size: 0.72rem; letter-spacing: 0.04em; min-height: 18px; font-family: 'Gowun Batang', serif; }
+  .guess-feedback.correct { color: var(--green); }
+  .guess-feedback.wrong   { color: var(--red); }
+  .reveal-area { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .reveal-btn { width: 100%; padding: 9px; font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; background: transparent; border: 1px solid var(--border); border-radius: 1px; cursor: pointer; color: var(--muted); transition: all 0.15s; }
+  .reveal-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .answer-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: center; }
+  .answer { font-family: 'Gowun Batang', serif; font-size: 1.25rem; text-align: center; color: var(--gold); opacity: 0; transform: translateY(4px); transition: all 0.3s ease; word-break: keep-all; }
+  .answer.visible { opacity: 1; transform: translateY(0); }
+  .score-strip { display: flex; align-items: center; justify-content: center; gap: 12px; padding-top: 6px; border-top: 1px solid var(--border); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .score-val { font-family: 'Gowun Batang', serif; font-size: 1.1rem; }
+  .s-correct { color: var(--green); } .s-wrong { color: var(--red); } .s-sep { color: var(--border); }
+  #counters-view { width: 100%; max-width: 520px; }
+  .counter-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .chip { padding: 8px 6px; text-align: center; font-family: 'Gowun Batang', serif; font-size: 0.95rem; background: transparent; border: 1px solid var(--border); border-radius: 2px; cursor: pointer; transition: all 0.15s; color: var(--ink); line-height: 1.4; }
+  .chip small { display: block; font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  .chip.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .chip.active small { color: rgba(245,240,232,0.5); }
+  .chip:hover:not(.active) { border-color: var(--gold); }
+
+  /* ═══════════════════════════════════
+     QUIZ STYLES
+  ═══════════════════════════════════ */
+  #quiz-view { width: 100%; max-width: 600px; }
+
+  .quiz-settings-bar {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 14px 18px; background: #faf7f2; border: 1px solid var(--border);
+    border-radius: 2px; margin-bottom: 20px; box-shadow: 3px 3px 0 rgba(0,0,0,0.04);
+  }
+  .quiz-settings-bar .field-label { margin-bottom: 0; white-space: nowrap; }
+  .quiz-settings-bar .cap-row { flex: 1; min-width: 180px; }
+
+  /* Progress bar */
+  .quiz-progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .quiz-progress-bar-outer { flex: 1; height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .quiz-progress-bar-inner { height: 100%; background: var(--gold); border-radius: 4px; transition: width 0.4s ease; width: 0%; }
+  .quiz-progress-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+  /* Score banner */
+  .quiz-score-banner { display: flex; justify-content: center; gap: 28px; padding: 10px 0 14px; }
+  .qsb-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .qsb-val { font-family: 'Gowun Batang', serif; font-size: 1.8rem; line-height: 1; }
+  .qsb-lbl { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .qsb-item.correct .qsb-val { color: var(--green); }
+  .qsb-item.wrong   .qsb-val { color: var(--red); }
+  .qsb-item.streak  .qsb-val { color: var(--gold); }
+
+  /* Question card */
+  .quiz-card {
+    background: #faf7f2; border: 1px solid var(--border); border-radius: 2px;
+    padding: 30px 26px; box-shadow: 3px 3px 0 rgba(0,0,0,0.06);
+    position: relative; overflow: hidden; min-height: 340px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .quiz-card::before { content: ''; position: absolute; top: 6px; left: 6px; right: -6px; bottom: -6px; border: 1px solid var(--border); border-radius: 2px; z-index: -1; opacity: 0.5; }
+
+  .quiz-type-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); padding: 3px 8px; border: 1px solid var(--border);
+    border-radius: 20px; width: fit-content;
+  }
+  .quiz-type-badge .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+  .quiz-type-badge.pure  .badge-dot { background: #6b8cba; }
+  .quiz-type-badge.sino  .badge-dot { background: #b8860b; }
+  .quiz-type-badge.pure  { color: #6b8cba; border-color: #c4d3e8; }
+  .quiz-type-badge.sino  { color: var(--gold); border-color: #e8d9aa; }
+
+  .quiz-direction {
+    font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  }
+
+  .quiz-prompt {
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    text-align: center; line-height: 1.25; word-break: keep-all;
+    padding: 8px 0;
+    opacity: 0; transform: translateY(6px);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .quiz-prompt.visible { opacity: 1; transform: translateY(0); }
+
+  /* Multiple choice options */
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quiz-opt {
+    padding: 13px 14px; text-align: center;
+    font-family: 'Gowun Batang', serif; font-size: 1.05rem; line-height: 1.35; word-break: keep-all;
+    background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius: 2px;
+    cursor: pointer; transition: all 0.15s;
+    opacity: 0; transform: translateY(6px);
+  }
+  .quiz-opt:nth-child(1) { transition-delay: 0.05s; }
+  .quiz-opt:nth-child(2) { transition-delay: 0.10s; }
+  .quiz-opt:nth-child(3) { transition-delay: 0.15s; }
+  .quiz-opt:nth-child(4) { transition-delay: 0.20s; }
+  .quiz-opt.visible { opacity: 1; transform: translateY(0); }
+  .quiz-opt:hover:not(.locked) { border-color: var(--gold); background: rgba(255,255,255,0.9); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .quiz-opt.selected-correct { border-color: var(--green); background: var(--green-bg); color: var(--green); box-shadow: inset 0 0 0 1px var(--green); }
+  .quiz-opt.selected-wrong   { border-color: var(--red);   background: var(--red-light);  color: var(--red);   box-shadow: inset 0 0 0 1px var(--red); }
+  .quiz-opt.reveal-correct   { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+  .quiz-opt.locked { cursor: default; }
+
+  /* Feedback line */
+  .quiz-feedback-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    min-height: 28px;
+  }
+  .quiz-feedback-msg {
+    font-family: 'Gowun Batang', serif; font-size: 1rem; letter-spacing: 0.02em;
+    opacity: 0; transform: translateX(-6px); transition: all 0.25s;
+  }
+  .quiz-feedback-msg.visible { opacity: 1; transform: translateX(0); }
+  .quiz-feedback-msg.correct { color: var(--green); }
+  .quiz-feedback-msg.wrong   { color: var(--red); }
+  .quiz-next-btn {
+    padding: 8px 18px; font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--ink); color: var(--paper); border: none; border-radius: 1px;
+    cursor: pointer; opacity: 0; transition: opacity 0.2s 0.15s, transform 0.15s;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .quiz-next-btn.visible { opacity: 1; }
+  .quiz-next-btn:hover { transform: translate(-1px,-1px); }
+
+  /* Results screen */
+  .quiz-results {
+    display: none; flex-direction: column; align-items: center; gap: 20px;
+    text-align: center; padding: 20px 0;
+  }
+  .quiz-results.visible { display: flex; }
+  .results-stamp {
+    font-family: 'Gowun Batang', serif; font-size: 1.4rem; color: var(--red);
+    border: 2px solid var(--red); display: inline-block; padding: 4px 16px;
+    transform: rotate(-2deg); opacity: 0.75;
+  }
+  .results-big { font-family: 'Gowun Batang', serif; font-size: 3.5rem; color: var(--ink); line-height: 1; }
+  .results-sub { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .results-breakdown { display: flex; gap: 32px; }
+  .rb-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .rb-val { font-family: 'Gowun Batang', serif; font-size: 2rem; }
+  .rb-val.c { color: var(--green); } .rb-val.w { color: var(--red); }
+  .rb-lbl { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .quiz-restart-btn { padding: 12px 28px; font-family: 'Gowun Batang', serif; font-size: 1rem; background: var(--red); color: white; border: none; border-radius: 1px; cursor: pointer; transition: all 0.15s; box-shadow: 2px 2px 0 rgba(192,57,43,0.3); }
+  .quiz-restart-btn:hover { background: #a93226; transform: translate(-1px,-1px); }
+
+  footer { margin-top: 56px; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.1em; text-align: center; }
+  .stamp { font-family: 'Gowun Batang', serif; font-size: 0.9rem; color: var(--red); border: 2px solid var(--red); display: inline-block; padding: 2px 8px; transform: rotate(-2deg); opacity: 0.6; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<header style="position:relative;">
+    <a href="index.html" style="position:absolute;left:0;top:0;font-size:0.75rem;color:var(--muted);text-decoration:none;font-family:'DM Mono';letter-spacing:0.1em;opacity:0.7;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">← Home</a>
+  <div class="stamp">연습</div>
+  <h1>Korean Number <span>Practice</span></h1>
+  <div class="divider"></div>
+  <p>숫자 연습 · Number Study Tool</p>
+</header>
+
+<div class="top-mode-bar">
+  <button class="top-mode-btn active" id="btn-numbers"  onclick="switchTopMode('numbers')"><span class="ko">숫자</span>Numbers</button>
+  <button class="top-mode-btn"        id="btn-counters" onclick="switchTopMode('counters')"><span class="ko">셀 때 쓰는 말</span>Counters</button>
+  <button class="top-mode-btn"        id="btn-quiz"     onclick="switchTopMode('quiz')"><span class="ko">퀴즈</span>Quiz</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     NUMBERS VIEW
+══════════════════════════════════════════ -->
+<div id="numbers-view" class="panels">
+  <!-- Pure Korean panel -->
+  <div class="panel">
+    <div class="panel-title">Pure Korean <span class="korean-title">고유어 숫자</span><span class="range">0 – 99</span></div>
+    <div><div class="field-label">Show me a number in…</div>
+      <div class="toggle-group">
+        <button class="toggle-btn active" onclick="setLang('native','en',this)">English</button>
+        <button class="toggle-btn" onclick="setLang('native','ko',this)">Korean</button>
+      </div>
+    </div>
+    <button class="gen-btn" onclick="generate('native')">Generate Number</button>
+    <div class="display-area" id="native-display"><span class="placeholder-text">Press generate</span><div class="display-number" id="native-number"></div></div>
+    <div class="guess-section" id="native-guess-section" style="display:none">
+      <div class="field-label">Your guess</div>
+      <div class="guess-row"><input class="guess-input" id="native-guess" type="text" placeholder="Type here…" onkeydown="if(event.key==='Enter')checkGuess('native')"><button class="check-btn" onclick="checkGuess('native')">Check</button></div>
+      <div class="guess-feedback" id="native-feedback"></div>
+    </div>
+    <div class="reveal-area"><button class="reveal-btn" id="native-reveal-btn" onclick="reveal('native')" style="display:none">Reveal Answer →</button><div class="answer-label" id="native-answer-label" style="display:none"></div><div class="answer" id="native-answer"></div></div>
+    <div class="score-strip"><span class="s-correct">✓ <span class="score-val" id="native-score-c">0</span></span><span class="s-sep">|</span><span class="s-wrong">✗ <span class="score-val" id="native-score-w">0</span></span></div>
+  </div>
+
+  <!-- Sino Korean panel -->
+  <div class="panel">
+    <div class="panel-title">Sino-Korean <span class="korean-title">한자어 숫자</span><span class="range" id="sino-range-label">0 – 100,000,000</span></div>
+    <div><div class="field-label">Show me a number in…</div>
+      <div class="toggle-group">
+        <button class="toggle-btn active" onclick="setLang('sino','en',this)">English</button>
+        <button class="toggle-btn" onclick="setLang('sino','ko',this)">Korean</button>
+      </div>
+    </div>
+    <div class="cap-row"><span class="cap-row-label">Limit range</span>
+      <label class="pill-label"><input type="checkbox" id="sino-cap" onchange="toggleSinoCap(this)"><span class="pill"></span>Easy mode (0–100,000)</label>
+    </div>
+    <button class="gen-btn" onclick="generate('sino')">Generate Number</button>
+    <div class="display-area" id="sino-display"><span class="placeholder-text">Press generate</span><div class="display-number" id="sino-number"></div></div>
+    <div class="guess-section" id="sino-guess-section" style="display:none">
+      <div class="field-label">Your guess</div>
+      <div class="guess-row"><input class="guess-input" id="sino-guess" type="text" placeholder="Type here…" onkeydown="if(event.key==='Enter')checkGuess('sino')"><button class="check-btn" onclick="checkGuess('sino')">Check</button></div>
+      <div class="guess-feedback" id="sino-feedback"></div>
+    </div>
+    <div class="reveal-area"><button class="reveal-btn" id="sino-reveal-btn" onclick="reveal('sino')" style="display:none">Reveal Answer →</button><div class="answer-label" id="sino-answer-label" style="display:none"></div><div class="answer" id="sino-answer"></div></div>
+    <div class="score-strip"><span class="s-correct">✓ <span class="score-val" id="sino-score-c">0</span></span><span class="s-sep">|</span><span class="s-wrong">✗ <span class="score-val" id="sino-score-w">0</span></span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     COUNTERS VIEW
+══════════════════════════════════════════ -->
+<div id="counters-view" style="display:none; width:100%; max-width:520px;">
+  <div class="panel">
+    <div class="panel-title">Counters <span class="korean-title">수 관형사 + 단위명사</span><span class="range">Modified pure Korean (한, 두, 세…)</span></div>
+    <div><div class="field-label">Choose a counter word</div><div class="counter-chips" id="counter-chip-grid"></div></div>
+    <div><div class="field-label">Show me the number in…</div>
+      <div class="toggle-group">
+        <button class="toggle-btn active" onclick="setLang('counter','en',this)">English</button>
+        <button class="toggle-btn" onclick="setLang('counter','ko',this)">Korean</button>
+      </div>
+    </div>
+    <button class="gen-btn" onclick="generate('counter')">Generate</button>
+    <div class="display-area" id="counter-display"><span class="placeholder-text">Choose a counter &amp; generate</span><div class="display-number" id="counter-number"></div><div class="display-sub" id="counter-sub"></div></div>
+    <div class="guess-section" id="counter-guess-section" style="display:none">
+      <div class="field-label">Your guess (number + counter word)</div>
+      <div class="guess-row"><input class="guess-input" id="counter-guess" type="text" placeholder="e.g. 두 명" onkeydown="if(event.key==='Enter')checkGuess('counter')"><button class="check-btn" onclick="checkGuess('counter')">Check</button></div>
+      <div class="guess-feedback" id="counter-feedback"></div>
+    </div>
+    <div class="reveal-area"><button class="reveal-btn" id="counter-reveal-btn" onclick="reveal('counter')" style="display:none">Reveal Answer →</button><div class="answer-label" id="counter-answer-label" style="display:none"></div><div class="answer" id="counter-answer"></div></div>
+    <div class="score-strip"><span class="s-correct">✓ <span class="score-val" id="counter-score-c">0</span></span><span class="s-sep">|</span><span class="s-wrong">✗ <span class="score-val" id="counter-score-w">0</span></span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     QUIZ VIEW
+══════════════════════════════════════════ -->
+<div id="quiz-view" style="display:none">
+
+  <!-- Settings bar -->
+  <div class="quiz-settings-bar">
+    <div class="field-label" style="margin-bottom:0">Quiz settings</div>
+    <div class="cap-row" style="flex:1; min-width:200px">
+      <span class="cap-row-label">Sino-Korean range</span>
+      <label class="pill-label"><input type="checkbox" id="quiz-cap" onchange="quizState.easyMode=this.checked"><span class="pill"></span>Easy (0–100,000)</label>
+    </div>
+    <div class="cap-row" style="flex:1; min-width:200px">
+      <span class="cap-row-label">Questions per round</span>
+      <div class="toggle-group" style="flex:none; width:auto">
+        <button class="toggle-btn active" style="padding:6px 12px" onclick="setQuizLen(10,this)">10</button>
+        <button class="toggle-btn"        style="padding:6px 12px" onclick="setQuizLen(20,this)">20</button>
+        <button class="toggle-btn"        style="padding:6px 12px" onclick="setQuizLen(30,this)">30</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress & scores -->
+  <div class="quiz-progress-wrap">
+    <span class="quiz-progress-label" id="quiz-q-label">0 / 10</span>
+    <div class="quiz-progress-bar-outer"><div class="quiz-progress-bar-inner" id="quiz-prog-bar"></div></div>
+    <span class="quiz-progress-label" id="quiz-streak-label">🔥 0</span>
+  </div>
+  <div class="quiz-score-banner">
+    <div class="qsb-item correct"><div class="qsb-val" id="quiz-sc">0</div><div class="qsb-lbl">Correct</div></div>
+    <div class="qsb-item wrong">  <div class="qsb-val" id="quiz-sw">0</div><div class="qsb-lbl">Wrong</div></div>
+    <div class="qsb-item streak"> <div class="qsb-val" id="quiz-pct">—</div><div class="qsb-lbl">Accuracy</div></div>
+  </div>
+
+  <!-- Question card -->
+  <div class="quiz-card" id="quiz-card">
+    <!-- Idle state -->
+    <div id="quiz-idle" style="display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; gap:16px; text-align:center">
+      <div style="font-family:'Gowun Batang',serif; font-size:1.5rem">준비됐나요?</div>
+      <div style="font-size:0.75rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase">Mix of Pure &amp; Sino Korean · 4 choices each</div>
+      <button class="gen-btn" style="max-width:200px" onclick="startQuiz()">Start Quiz →</button>
+    </div>
+
+    <!-- Active question state -->
+    <div id="quiz-active" style="display:none; flex-direction:column; gap:16px; flex:1">
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px">
+        <div class="quiz-type-badge" id="quiz-badge"><span class="badge-dot"></span><span id="quiz-badge-text"></span></div>
+        <div class="quiz-direction" id="quiz-direction"></div>
+      </div>
+      <div class="quiz-prompt" id="quiz-prompt"></div>
+      <div class="quiz-options" id="quiz-options"></div>
+      <div class="quiz-feedback-row">
+        <div class="quiz-feedback-msg" id="quiz-fb-msg"></div>
+        <button class="quiz-next-btn" id="quiz-next-btn" onclick="nextQuestion()">Next →</button>
+      </div>
+    </div>
+
+    <!-- Results state -->
+    <div class="quiz-results" id="quiz-results">
+      <div class="results-stamp" id="results-stamp">완료!</div>
+      <div class="results-big" id="results-pct-big">—</div>
+      <div class="results-sub" id="results-sub-line"></div>
+      <div class="results-breakdown">
+        <div class="rb-item"><div class="rb-val c" id="res-c">0</div><div class="rb-lbl">Correct</div></div>
+        <div class="rb-item"><div class="rb-val w" id="res-w">0</div><div class="rb-lbl">Wrong</div></div>
+      </div>
+      <button class="quiz-restart-btn" onclick="startQuiz()">Play Again →</button>
+    </div>
+  </div>
+</div>
+
+<footer><p>하나 둘 셋 · 일 이 삼</p></footer>
+
+<script>
+// ════════════════════════════════════════════════
+//  KOREAN NUMBER LOGIC
+// ════════════════════════════════════════════════
+const nativeUnits  = ['','하나','둘','셋','넷','다섯','여섯','일곱','여덟','아홉'];
+const nativeTens   = ['','열','스물','서른','마흔','쉰','예순','일흔','여든','아흔'];
+const counterUnits = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉'];
+const counterTens  = ['','열','스무','서른','마흔','쉰','예순','일흔','여든','아흔'];
+
+function toNativeKorean(n, forCounter) {
+  if (n === 0) return '영';
+  const units = forCounter ? counterUnits : nativeUnits;
+  const tens  = forCounter ? counterTens  : nativeTens;
+  const t = Math.floor(n/10), u = n%10;
+  return (tens[t]||'') + (units[u]||'');
+}
+
+const sinoDigits = ['영','일','이','삼','사','오','육','칠','팔','구'];
+function toSinoKorean(n) {
+  if (n === 0) return '영';
+  if (n === 100000000) return '일억';
+  let r = '';
+  if (n >= 10000) { r += sinoChunk(Math.floor(n/10000))+'만'; n%=10000; }
+  if (n >= 1000)  { const k=Math.floor(n/1000); r+=(k===1?'':sinoDigits[k])+'천'; n%=1000; }
+  if (n >= 100)   { const h=Math.floor(n/100);  r+=(h===1?'':sinoDigits[h])+'백'; n%=100; }
+  if (n >= 10)    { const t=Math.floor(n/10);   r+=(t===1?'':sinoDigits[t])+'십'; n%=10; }
+  if (n > 0)      r += sinoDigits[n];
+  return r;
+}
+function sinoChunk(n) {
+  let r='';
+  if (n>=1000){const k=Math.floor(n/1000);r+=(k===1?'':sinoDigits[k])+'천';n%=1000;}
+  if (n>=100) {const h=Math.floor(n/100); r+=(h===1?'':sinoDigits[h])+'백';n%=100;}
+  if (n>=10)  {const t=Math.floor(n/10);  r+=(t===1?'':sinoDigits[t])+'십';n%=10;}
+  if (n>0)    r+=sinoDigits[n];
+  return r;
+}
+function fmt(n) { return n.toLocaleString('en-US'); }
+
+// ════════════════════════════════════════════════
+//  COUNTERS DATA
+// ════════════════════════════════════════════════
+const COUNTERS = [
+  { ko:'시',   en:'o\'clock',  hint:'time — hours (1–12)',       min:1,  max:12          },
+  { ko:'분',   en:'minutes',   hint:'time — minutes (Sino)',      min:1,  max:59, sino:true },
+  { ko:'명',   en:'people',    hint:'people (formal)',            min:1,  max:99          },
+  { ko:'개',   en:'things',    hint:'general objects',            min:1,  max:99          },
+  { ko:'마리', en:'animals',   hint:'animals',                    min:1,  max:99          },
+  { ko:'권',   en:'books',     hint:'books / bound volumes',      min:1,  max:99          },
+  { ko:'병',   en:'bottles',   hint:'bottles',                    min:1,  max:99          },
+  { ko:'잔',   en:'cups',      hint:'cups / glasses',             min:1,  max:99          },
+  { ko:'살',   en:'years old', hint:'age',                       min:1,  max:99          },
+  { ko:'번',   en:'times',     hint:'occurrences / times',        min:1,  max:99          },
+  { ko:'대',   en:'vehicles',  hint:'cars, machines',             min:1,  max:99          },
+  { ko:'장',   en:'sheets',    hint:'flat things (paper, cards)', min:1,  max:99          },
+];
+
+// ════════════════════════════════════════════════
+//  PRACTICE STATE
+// ════════════════════════════════════════════════
+const state = {
+  native:  { lang:'en', currentNum:null, answered:false, sc:0, sw:0 },
+  sino:    { lang:'en', currentNum:null, answered:false, sc:0, sw:0, cap:false },
+  counter: { lang:'en', currentNum:null, answered:false, sc:0, sw:0, idx:0 },
+};
+
+// ════════════════════════════════════════════════
+//  QUIZ STATE
+// ════════════════════════════════════════════════
+const quizState = {
+  easyMode: false,
+  totalQ: 10,
+  currentQ: 0,
+  sc: 0, sw: 0, streak: 0, bestStreak: 0,
+  answered: false,
+  correctText: '',
+};
+
+// ════════════════════════════════════════════════
+//  BUILD COUNTER CHIPS
+// ════════════════════════════════════════════════
+function buildChips() {
+  const grid = document.getElementById('counter-chip-grid');
+  COUNTERS.forEach((c,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'chip'+(i===0?' active':'');
+    btn.innerHTML = `${c.ko} <small>${c.en}</small>`;
+    btn.onclick = () => {
+      document.querySelectorAll('#counter-chip-grid .chip').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      state.counter.idx = i;
+      resetPanel('counter');
+    };
+    grid.appendChild(btn);
+  });
+}
+
+// ════════════════════════════════════════════════
+//  TOP MODE SWITCH
+// ════════════════════════════════════════════════
+function switchTopMode(mode) {
+  ['numbers','counters','quiz'].forEach(m => {
+    document.getElementById(m+'-view').style.display = m===mode ? '' : 'none';
+    document.getElementById('btn-'+m).classList.toggle('active', m===mode);
+  });
+}
+
+// ════════════════════════════════════════════════
+//  LANG / CAP TOGGLES
+// ════════════════════════════════════════════════
+function setLang(panel, lang, btn) {
+  state[panel].lang = lang;
+  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if (state[panel].currentNum !== null) { displayNumber(panel, state[panel].currentNum); resetGuess(panel); hideAnswer(panel); }
+}
+function toggleSinoCap(cb) {
+  state.sino.cap = cb.checked;
+  document.getElementById('sino-range-label').textContent = cb.checked ? '0 – 100,000' : '0 – 100,000,000';
+  resetPanel('sino');
+}
+function setQuizLen(n, btn) {
+  quizState.totalQ = n;
+  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ════════════════════════════════════════════════
+//  PRACTICE – GENERATE / DISPLAY / GUESS / REVEAL
+// ════════════════════════════════════════════════
+function generate(panel) {
+  let n;
+  if (panel==='native') {
+    n = Math.floor(Math.random()*100);
+  } else if (panel==='sino') {
+    const cap = state.sino.cap ? 100000 : 100000000;
+    n = Math.floor(Math.random()*(cap+1));
+  } else {
+    const c = COUNTERS[state.counter.idx];
+    n = c.min + Math.floor(Math.random()*(c.max-c.min+1));
+  }
+  state[panel].currentNum = n; state[panel].answered = false;
+  displayNumber(panel, n); resetGuess(panel); hideAnswer(panel);
+  document.getElementById(panel+'-guess-section').style.display='';
+  document.getElementById(panel+'-reveal-btn').style.display='block';
+  setTimeout(()=>document.getElementById(panel+'-guess').focus(), 80);
+}
+
+function displayNumber(panel, n) {
+  const numEl = document.getElementById(panel+'-number');
+  const ph    = document.querySelector('#'+panel+'-display .placeholder-text');
+  const subEl = document.getElementById(panel+'-sub');
+  const lang  = state[panel].lang;
+  let text;
+  if (panel==='counter') {
+    const c = COUNTERS[state.counter.idx];
+    text = lang==='en' ? fmt(n) : (c.sino?toSinoKorean(n):toNativeKorean(n,true))+' '+c.ko;
+  } else {
+    text = lang==='en' ? fmt(n) : panel==='native' ? toNativeKorean(n) : toSinoKorean(n);
+  }
+  numEl.classList.remove('visible');
+  if(subEl) subEl.classList.remove('visible');
+  setTimeout(()=>{
+    numEl.textContent=text; numEl.classList.add('visible');
+    if(ph) ph.style.display='none';
+    if(panel==='counter'&&subEl){subEl.textContent=COUNTERS[state.counter.idx].hint;subEl.classList.add('visible');}
+  },80);
+}
+
+function getAnswer(panel, n) {
+  const lang=state[panel].lang;
+  if(panel==='counter'){
+    const c=COUNTERS[state.counter.idx];
+    return lang==='en' ? (c.sino?toSinoKorean(n):toNativeKorean(n,true))+' '+c.ko : fmt(n);
+  }
+  return lang==='en' ? (panel==='native'?toNativeKorean(n):toSinoKorean(n)) : fmt(n);
+}
+
+function checkGuess(panel) {
+  if(state[panel].currentNum===null||state[panel].answered) return;
+  const n=state[panel].currentNum;
+  const input=document.getElementById(panel+'-guess');
+  const fb=document.getElementById(panel+'-feedback');
+  const guess=input.value.trim().replace(/\s+/g,' ');
+  if(!guess) return;
+  const correct=getAnswer(panel,n);
+  const norm=s=>s.replace(/,/g,'').toLowerCase().trim().replace(/\s+/g,' ');
+  const ok=norm(guess)===norm(correct);
+  state[panel].answered=true;
+  if(ok){state[panel].sc++;input.classList.add('correct');fb.textContent='✓ 정답이에요!  Correct!';fb.className='guess-feedback correct';}
+  else  {state[panel].sw++;input.classList.add('wrong');  fb.textContent='✗  Answer: '+correct;    fb.className='guess-feedback wrong';}
+  document.getElementById(panel+'-score-c').textContent=state[panel].sc;
+  document.getElementById(panel+'-score-w').textContent=state[panel].sw;
+}
+
+function reveal(panel) {
+  const n=state[panel].currentNum; if(n===null) return;
+  const ansText=getAnswer(panel,n); const lang=state[panel].lang;
+  const lbl=document.getElementById(panel+'-answer-label');
+  const ans=document.getElementById(panel+'-answer');
+  lbl.textContent=lang==='en'?'Korean answer:':'English answer:'; lbl.style.display='block';
+  ans.classList.remove('visible'); ans.textContent=ansText;
+  setTimeout(()=>ans.classList.add('visible'),30);
+}
+
+function resetGuess(panel) {
+  const input=document.getElementById(panel+'-guess'); const fb=document.getElementById(panel+'-feedback');
+  if(input){input.value='';input.className='guess-input';} if(fb){fb.textContent='';fb.className='guess-feedback';}
+  state[panel].answered=false;
+}
+function hideAnswer(panel) {
+  const ans=document.getElementById(panel+'-answer'); const lbl=document.getElementById(panel+'-answer-label');
+  ans.classList.remove('visible'); lbl.style.display='none';
+  setTimeout(()=>{if(ans)ans.textContent='';},300);
+}
+function resetPanel(panel) {
+  state[panel].currentNum=null; resetGuess(panel); hideAnswer(panel);
+  const numEl=document.getElementById(panel+'-number'); const ph=document.querySelector('#'+panel+'-display .placeholder-text');
+  if(numEl){numEl.classList.remove('visible');numEl.textContent='';} if(ph)ph.style.display='';
+  const revBtn=document.getElementById(panel+'-reveal-btn'); const gSec=document.getElementById(panel+'-guess-section');
+  if(revBtn)revBtn.style.display='none'; if(gSec)gSec.style.display='none';
+}
+
+// ════════════════════════════════════════════════
+//  QUIZ ENGINE
+// ════════════════════════════════════════════════
+
+function randInt(min, max) { return min + Math.floor(Math.random()*(max-min+1)); }
+
+// ── Question generation ──────────────────────────────────────────────────
+// type: 'pure' or 'sino'
+// direction: 'ko_to_en' (show Korean, pick English) or 'en_to_ko' (show English, pick Korean)
+function makeQuestion() {
+  const easyMode = quizState.easyMode;
+  const type = Math.random() < 0.45 ? 'pure' : 'sino'; // slight bias toward sino for variety
+  const direction = Math.random() < 0.5 ? 'ko_to_en' : 'en_to_ko';
+
+  let n, maxN;
+  if (type === 'pure') {
+    n = randInt(1, 99);
+    maxN = 99;
+  } else {
+    maxN = easyMode ? 100000 : 100000000;
+    n = randInt(0, maxN);
+  }
+
+  const koText = type === 'pure' ? toNativeKorean(n) : toSinoKorean(n);
+  const enText = fmt(n);
+
+  const promptText  = direction === 'ko_to_en' ? koText  : enText;
+  const correctText = direction === 'ko_to_en' ? enText  : koText;
+
+  // Generate distractors
+  const distractors = makeDistractors(n, type, direction, maxN);
+
+  // Shuffle all 4 options
+  const options = shuffle([correctText, ...distractors]);
+
+  return { type, direction, promptText, correctText, options };
+}
+
+// ── Distractor generation ────────────────────────────────────────────────
+function makeDistractors(n, type, direction, maxN) {
+  const distractors = new Set();
+
+  // Strategy A: similar nearby numbers (hard – confusable)
+  const nearbyDeltas = type === 'pure'
+    ? [1, 2, 10, 11, -1, -10]   // pure: single digit or decade off
+    : generateSinoDelta(n, maxN); // sino: digit-position tweak
+
+  for (const d of nearbyDeltas) {
+    const candidate = n + d;
+    if (candidate >= 0 && candidate <= maxN && candidate !== n) {
+      const cText = direction === 'ko_to_en'
+        ? fmt(candidate)
+        : (type === 'pure' ? toNativeKorean(candidate) : toSinoKorean(candidate));
+      if (cText !== (direction === 'ko_to_en' ? fmt(n) : (type==='pure'?toNativeKorean(n):toSinoKorean(n)))) {
+        distractors.add(cText);
+      }
+    }
+    if (distractors.size >= 2) break;
+  }
+
+  // Strategy B: random from same range (easy – clearly different)
+  let safetyBail = 0;
+  while (distractors.size < 3 && safetyBail++ < 60) {
+    let r;
+    if (type === 'pure') {
+      r = randInt(1, 99);
+    } else {
+      // bias toward same order-of-magnitude
+      const mag = Math.max(1, Math.floor(Math.log10(n+1)));
+      const rangeLow  = Math.max(0, Math.floor(Math.pow(10, mag-1)));
+      const rangeHigh = Math.min(maxN, Math.floor(Math.pow(10, mag+1)-1));
+      r = randInt(rangeLow, rangeHigh);
+    }
+    if (r === n) continue;
+    const rText = direction === 'ko_to_en'
+      ? fmt(r)
+      : (type === 'pure' ? toNativeKorean(r) : toSinoKorean(r));
+    distractors.add(rText);
+  }
+
+  const arr = [...distractors];
+  return arr.slice(0, 3);
+}
+
+function generateSinoDelta(n, maxN) {
+  // Tweak specific digit positions to create realistic Korean reading errors
+  const deltas = [];
+  const mag = Math.ceil(Math.log10(n+2));
+
+  // swap a digit at a random position
+  const positions = [1, 10, 100, 1000, 10000, 100000, 1000000].filter(p => p <= maxN);
+  for (const p of positions) {
+    for (const mult of [1, 2, -1, -2, 3, -3]) {
+      deltas.push(p * mult);
+    }
+  }
+  return shuffle(deltas).slice(0, 8);
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+// ── Quiz flow ─────────────────────────────────────────────────────────────
+function startQuiz() {
+  quizState.currentQ = 0;
+  quizState.sc = 0; quizState.sw = 0;
+  quizState.streak = 0; quizState.bestStreak = 0;
+  quizState.answered = false;
+  updateQuizScoreboard();
+  document.getElementById('quiz-idle').style.display    = 'none';
+  document.getElementById('quiz-results').classList.remove('visible');
+  document.getElementById('quiz-active').style.display  = 'flex';
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (quizState.currentQ >= quizState.totalQ) { showResults(); return; }
+
+  quizState.currentQ++;
+  quizState.answered = false;
+
+  const q = makeQuestion();
+  quizState.correctText = q.correctText;
+
+  // Badge
+  const badge = document.getElementById('quiz-badge');
+  const badgeText = document.getElementById('quiz-badge-text');
+  badge.className = 'quiz-type-badge ' + q.type;
+  badgeText.textContent = q.type === 'pure' ? 'Pure Korean · 고유어' : 'Sino-Korean · 한자어';
+
+  // Direction label
+  const dirEl = document.getElementById('quiz-direction');
+  dirEl.textContent = q.direction === 'ko_to_en'
+    ? 'Korean → English: what number is this?'
+    : 'English → Korean: how do you say this?';
+
+  // Prompt
+  const promptEl = document.getElementById('quiz-prompt');
+  promptEl.classList.remove('visible');
+  promptEl.textContent = q.promptText;
+  setTimeout(() => promptEl.classList.add('visible'), 30);
+
+  // Options
+  const optsEl = document.getElementById('quiz-options');
+  optsEl.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(btn, opt, q.correctText);
+    optsEl.appendChild(btn);
+    requestAnimationFrame(() => requestAnimationFrame(() => btn.classList.add('visible')));
+  });
+
+  // Feedback & next
+  const fb = document.getElementById('quiz-fb-msg');
+  fb.textContent = ''; fb.className = 'quiz-feedback-msg';
+  const nextBtn = document.getElementById('quiz-next-btn');
+  nextBtn.classList.remove('visible');
+
+  // Progress
+  updateProgress();
+}
+
+function selectAnswer(btn, chosen, correct) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+
+  // Lock all options
+  document.querySelectorAll('.quiz-opt').forEach(b => b.classList.add('locked'));
+
+  const isCorrect = chosen === correct;
+
+  if (isCorrect) {
+    btn.classList.add('selected-correct');
+    quizState.sc++;
+    quizState.streak++;
+    quizState.bestStreak = Math.max(quizState.bestStreak, quizState.streak);
+  } else {
+    btn.classList.add('selected-wrong');
+    quizState.sw++;
+    quizState.streak = 0;
+    // Reveal the correct answer
+    document.querySelectorAll('.quiz-opt').forEach(b => {
+      if (b.textContent === correct) b.classList.add('reveal-correct');
+    });
+  }
+
+  // Feedback message
+  const fb = document.getElementById('quiz-fb-msg');
+  const streakMsg = quizState.streak >= 3 ? `  🔥 ${quizState.streak} streak!` : '';
+  fb.textContent = isCorrect
+    ? '✓ 정답이에요!' + streakMsg
+    : `✗  ${correct}`;
+  fb.className = 'quiz-feedback-msg visible ' + (isCorrect ? 'correct' : 'wrong');
+
+  // Show next button
+  const nextBtn = document.getElementById('quiz-next-btn');
+  nextBtn.textContent = quizState.currentQ >= quizState.totalQ ? 'See Results →' : 'Next →';
+  nextBtn.classList.add('visible');
+
+  updateQuizScoreboard();
+}
+
+function updateProgress() {
+  const total = quizState.totalQ;
+  const done  = quizState.currentQ - 1;
+  document.getElementById('quiz-q-label').textContent = `${quizState.currentQ} / ${total}`;
+  document.getElementById('quiz-prog-bar').style.width = `${(done/total)*100}%`;
+  document.getElementById('quiz-streak-label').textContent = `🔥 ${quizState.streak}`;
+}
+
+function updateQuizScoreboard() {
+  document.getElementById('quiz-sc').textContent  = quizState.sc;
+  document.getElementById('quiz-sw').textContent  = quizState.sw;
+  const total = quizState.sc + quizState.sw;
+  document.getElementById('quiz-pct').textContent = total > 0 ? Math.round((quizState.sc/total)*100)+'%' : '—';
+  document.getElementById('quiz-streak-label').textContent = `🔥 ${quizState.streak}`;
+}
+
+function showResults() {
+  document.getElementById('quiz-active').style.display = 'none';
+  // Progress to 100%
+  document.getElementById('quiz-prog-bar').style.width = '100%';
+  document.getElementById('quiz-q-label').textContent  = `${quizState.totalQ} / ${quizState.totalQ}`;
+
+  const total = quizState.sc + quizState.sw;
+  const pct   = total > 0 ? Math.round((quizState.sc/total)*100) : 0;
+
+  document.getElementById('results-pct-big').textContent = pct + '%';
+  document.getElementById('res-c').textContent = quizState.sc;
+  document.getElementById('res-w').textContent = quizState.sw;
+
+  let stamp = '완료!', sub = '';
+  if      (pct === 100) { stamp = '완벽해요! 🎉'; sub = 'Perfect score! You nailed it.'; }
+  else if (pct >= 80)   { stamp = '잘 했어요! 👏'; sub = `Great job! Best streak: ${quizState.bestStreak}`; }
+  else if (pct >= 60)   { stamp = '좋아요!';       sub = `Keep practising! Best streak: ${quizState.bestStreak}`; }
+  else                   { stamp = '화이팅!';       sub = `You can do it! Best streak: ${quizState.bestStreak}`; }
+
+  document.getElementById('results-stamp').textContent    = stamp;
+  document.getElementById('results-sub-line').textContent = sub;
+
+  const res = document.getElementById('quiz-results');
+  res.classList.add('visible');
+}
+
+// ════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════
+buildChips();
+</script>
+</body>
+</html>
