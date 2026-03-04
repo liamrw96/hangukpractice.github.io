@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="한국어">
+<meta name="theme-color" content="#f5f0e8">
 <title>한국어 Practice</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
@@ -578,12 +582,51 @@
     letter-spacing: 0.08em;
   }
 
-  /* Responsive */
-  @media (max-width: 500px) {
-    .options-grid { grid-template-columns: 1fr; }
+  /* ===== MOBILE OPTIMISATION ===== */
+  html { -webkit-text-size-adjust: 100%; }
+  * { -webkit-tap-highlight-color: transparent; }
+  button, a { touch-action: manipulation; }
+  .panel { -webkit-overflow-scrolling: touch; }
+
+  /* Remove sticky hover states on touch devices */
+  @media (hover: none) {
+    .nav-btn:hover { background: transparent; color: var(--ink); border-color: var(--border); }
+    .option-btn:hover:not(:disabled) { border-color: var(--border); background: var(--paper-dark); }
+    .result-btn.knew:hover { background: transparent; color: var(--sage); }
+    .result-btn.didnt:hover { background: transparent; color: var(--red); }
+    .shuffle-btn:hover { border-color: var(--border); color: var(--muted); }
+    .quiz-next-btn:hover, .grammar-next-btn:hover, .check-btn:hover { background: var(--ink); }
+  }
+  button:active { opacity: 0.75; transform: scale(0.97); }
+
+  @media (max-width: 600px) {
+    /* Safe area for notch / home bar */
+    body { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+    header { padding-top: calc(1.5rem + env(safe-area-inset-top)); }
+
+    /* Bigger touch targets (Apple HIG min 44x44px) */
+    .tab-btn { padding: 1rem 1.1rem; font-size: 0.82rem; min-height: 48px; }
+    .nav-btn { width: 56px; height: 56px; font-size: 1.4rem; }
+    .result-btn { padding: 0.85rem 1.8rem; font-size: 0.95rem; min-height: 48px; }
+    .option-btn { padding: 1rem; font-size: 0.95rem; min-height: 52px; }
+    .check-btn { padding: 0.85rem 1.2rem; min-height: 48px; }
+    .quiz-next-btn, .grammar-next-btn { width: 100%; padding: 0.9rem; min-height: 48px; }
+
+    /* CRITICAL: font-size ≥16px on inputs prevents iOS auto-zoom */
+    input, select, textarea { font-size: 16px !important; }
+    .grammar-input { font-size: 16px; min-height: 48px; }
+
+    /* Layout adjustments */
+    .flashcard-scene { height: 240px; }
     .card-word { font-size: 2rem; }
-    .quiz-question { font-size: 1.6rem; }
+    .card-back .card-word { font-size: 1.6rem; }
+    .options-grid { grid-template-columns: 1fr; gap: 0.6rem; }
+    .quiz-question { font-size: 1.8rem; }
+    .grammar-input-wrap { flex-direction: column; }
+    .check-btn { width: 100%; }
     h1 { font-size: 1.8rem; }
+    .panel { padding: 1.5rem 1rem 5rem; }
+    .direction-toggle button { padding: 0.6rem 0.9rem; min-height: 40px; }
   }
 </style>
 </head>

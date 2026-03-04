@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Numbers">
+<meta name="theme-color" content="#f5f0e8">
 <title>Korean Number Practice</title>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -42,6 +46,26 @@
   /* ── Shared panel ── */
   .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; max-width: 900px; }
   @media (max-width: 660px) { .panels { grid-template-columns: 1fr; } }
+
+  /* ===== MOBILE OPTIMISATION ===== */
+  html { -webkit-text-size-adjust: 100%; }
+  * { -webkit-tap-highlight-color: transparent; }
+  button, a { touch-action: manipulation; }
+  button:active { opacity: 0.75; transform: scale(0.97); }
+
+  @media (hover: none) {
+    button:hover { opacity: 1; }
+  }
+
+  @media (max-width: 600px) {
+    body { padding-top: calc(2rem + env(safe-area-inset-top)); padding-bottom: calc(4rem + env(safe-area-inset-bottom)); }
+
+    /* Prevent iOS zoom on input focus */
+    input, select, textarea { font-size: 16px !important; }
+
+    /* Bigger touch targets */
+    button { min-height: 44px; }
+  }
   .panel { background: #faf7f2; border: 1px solid var(--border); border-radius: 2px; padding: 26px 22px; position: relative; box-shadow: 3px 3px 0 rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 16px; }
   .panel::before { content: ''; position: absolute; top: 6px; left: 6px; right: -6px; bottom: -6px; border: 1px solid var(--border); border-radius: 2px; z-index: -1; opacity: 0.5; }
   .panel-title { font-family: 'Gowun Batang', serif; font-size: 1.2rem; font-weight: 700; display: flex; flex-direction: column; gap: 2px; }

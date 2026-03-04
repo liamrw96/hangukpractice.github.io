@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="한국어">
+<meta name="theme-color" content="#f5f0e8">
 <title>한국어 Study Suite</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <style>
@@ -213,7 +217,23 @@
     color: var(--gold);
   }
 
-  .footer {
+  html { -webkit-text-size-adjust: 100%; }
+  * { -webkit-tap-highlight-color: transparent; }
+  a { touch-action: manipulation; }
+
+  .study-card:active { transform: scale(0.98); opacity: 0.9; }
+
+  @media (hover: none) {
+    .study-card:hover { transform: none; border-color: var(--border); box-shadow: 0 2px 12px rgba(26,18,8,0.06); }
+    .study-card:hover .card-arrow { transform: none; color: var(--border); }
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 2rem 1.2rem calc(2rem + env(safe-area-inset-bottom)); padding-top: calc(2rem + env(safe-area-inset-top)); }
+    .study-card { padding: 1.2rem 1.4rem; }
+    .card-title { font-size: 1.1rem; }
+    h1 { font-size: clamp(1.9rem, 8vw, 2.8rem); }
+  }
     font-family: 'Noto Serif KR', serif;
     font-size: 0.72rem;
     color: var(--muted);
