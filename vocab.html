@@ -650,6 +650,7 @@
     <div class="direction-toggle">
       <button id="dir-ko" class="active" onclick="setDirection('ko')">Korean → English</button>
       <button id="dir-en" onclick="setDirection('en')">English → Korean</button>
+      <button id="dir-mix" onclick="setDirection('mix')">Mixed</button>
     </div>
     <button class="shuffle-btn" onclick="shuffleAndReset()">⇄ Shuffle</button>
     <span id="fc-known-badge" style="font-size:0.78rem;color:var(--muted);font-family:'Noto Serif KR'"></span>
@@ -657,7 +658,7 @@
 
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" id="fc-progress" style="width:0%"></div></div>
-    <div class="progress-label" id="fc-count">1 / 165</div>
+    <div class="progress-label" id="fc-count">1 / 173</div>
   </div>
 
   <div class="flashcard-scene" onclick="flipCard()">
@@ -838,7 +839,12 @@ const vocab = [
   {ko:'한국어',en:'Korean'},{ko:'할머니',en:'grandmother'},
   {ko:'할아버지',en:'grandfather'},{ko:'해군',en:'member of the Army, Navy, Air Force (Navy)'},
   {ko:'형',en:'elder brother (for a boy)'},{ko:'형제',en:'brothers'},
-  {ko:'호주',en:'Australia'},{ko:'화장실',en:'toilet'},{ko:'휴게실',en:'lounge room'}
+  {ko:'호주',en:'Australia'},{ko:'화장실',en:'toilet'},{ko:'휴게실',en:'lounge room'},
+  // Unit 5 additions
+  {ko:'가족',en:'family'},{ko:'이름',en:'name'},{ko:'우리',en:'we / our'},
+  {ko:'첫째',en:'first (ordinal)'},{ko:'둘째',en:'second (ordinal)'},
+  {ko:'셋째',en:'third (ordinal)'},{ko:'넷째',en:'fourth (ordinal)'},
+  {ko:'막내',en:'youngest child'}
 ];
 
 // ===== VERB CONJUGATION DATA =====
@@ -909,6 +915,7 @@ function showTab(name) {
 let fcDeck = shuffle([...vocab]);
 let fcIdx = 0;
 let fcDirection = 'ko'; // 'ko' = show korean, answer english
+let fcCurrentShowKo = true;
 let fcFlipped = false;
 let fcKnew = 0;
 let fcLearning = 0;
@@ -918,10 +925,14 @@ function setDirection(dir) {
   fcDirection = dir;
   document.getElementById('dir-ko').classList.toggle('active', dir === 'ko');
   document.getElementById('dir-en').classList.toggle('active', dir === 'en');
+  document.getElementById('dir-mix').classList.toggle('active', dir === 'mix');
   fcFlipped = false;
-  document.getElementById('flashcard').classList.remove('flipped');
+  const card = document.getElementById('flashcard');
+  card.classList.remove('flipped');
   document.getElementById('fc-result-btns').style.display = 'none';
-  renderFC();
+  // Clear back face immediately so it can't be glimpsed
+  document.getElementById('fc-back-word').textContent = '';
+  setTimeout(renderFC, 560);
 }
 
 function shuffleAndReset() {
@@ -935,15 +946,21 @@ function shuffleAndReset() {
   document.getElementById('fc-result-btns').style.display = 'none';
   document.getElementById('stat-knew').textContent = 0;
   document.getElementById('stat-learning').textContent = 0;
-  renderFC();
+  document.getElementById('fc-back-word').textContent = '';
+  setTimeout(renderFC, 560);
 }
 
 function renderFC() {
   const card = fcDeck[fcIdx];
-  const frontWord = fcDirection === 'ko' ? card.ko : card.en;
-  const backWord  = fcDirection === 'ko' ? card.en : card.ko;
-  const frontLbl  = fcDirection === 'ko' ? '한국어' : 'English';
-  const backLbl   = fcDirection === 'ko' ? 'English' : '한국어';
+  // For mixed mode, randomly pick direction per card
+  const showKo = fcDirection === 'ko' ? true : fcDirection === 'en' ? false : Math.random() < 0.5;
+  const frontWord = showKo ? card.ko : card.en;
+  const backWord  = showKo ? card.en : card.ko;
+  const frontLbl  = showKo ? '한국어' : 'English';
+  const backLbl   = showKo ? 'English' : '한국어';
+
+  // Store current card's direction for this card instance
+  fcCurrentShowKo = showKo;
 
   document.getElementById('fc-front-label').textContent = frontLbl;
   document.getElementById('fc-back-label').textContent  = backLbl;
@@ -972,9 +989,12 @@ function nextCard() {
   if (fcIdx < fcDeck.length - 1) {
     fcIdx++;
     fcFlipped = false;
-    document.getElementById('flashcard').classList.remove('flipped');
+    const card = document.getElementById('flashcard');
+    card.classList.remove('flipped');
     document.getElementById('fc-result-btns').style.display = 'none';
-    renderFC();
+    // Blank the back face immediately, then update content after flip-back animation
+    document.getElementById('fc-back-word').textContent = '';
+    setTimeout(renderFC, 560);
   }
 }
 
@@ -984,7 +1004,8 @@ function prevCard() {
     fcFlipped = false;
     document.getElementById('flashcard').classList.remove('flipped');
     document.getElementById('fc-result-btns').style.display = 'none';
-    renderFC();
+    document.getElementById('fc-back-word').textContent = '';
+    setTimeout(renderFC, 560);
   }
 }
 
