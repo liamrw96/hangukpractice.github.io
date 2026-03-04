@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한국어 Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --paper-dark: #ede6d6;
+    --red: #c0392b;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --sage: #5a7a5a;
+    --muted: #7a6a55;
+    --border: #c8b89a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 0%, rgba(184,134,11,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(192,57,43,0.05) 0%, transparent 50%);
+  }
+
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 1.5rem;
+    border-bottom: 2px solid var(--border);
+    background: linear-gradient(to bottom, rgba(237,230,214,0.8), transparent);
+    position: relative;
+  }
+
+  header::before {
+    content: '한국어';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Noto Serif KR', serif;
+    font-size: 8rem;
+    color: rgba(184,134,11,0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    position: relative;
+  }
+
+  h1 span {
+    color: var(--red);
+    font-style: italic;
+  }
+
+  .subtitle {
+    font-family: 'Noto Serif KR', serif;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* TABS */
+  .tab-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    background: var(--paper-dark);
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 0.9rem 2rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover { color: var(--ink); }
+  .tab-btn.active {
+    color: var(--red);
+    border-bottom-color: var(--red);
+    background: var(--paper);
+  }
+
+  .tab-icon { margin-right: 0.4rem; }
+
+  /* PANELS */
+  .panel { display: none; padding: 2rem 1rem; max-width: 780px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .progress-label { font-size: 0.8rem; color: var(--muted); white-space: nowrap; font-family: 'Noto Serif KR'; }
+
+  /* =================== FLASHCARD TAB =================== */
+  .fc-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .direction-toggle {
+    display: flex;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .direction-toggle button {
+    padding: 0.45rem 1rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--muted);
+    transition: all 0.2s;
+    font-family: 'Noto Sans KR';
+  }
+  .direction-toggle button.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .shuffle-btn {
+    padding: 0.45rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: 'Noto Sans KR';
+    transition: all 0.2s;
+  }
+  .shuffle-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .flashcard-scene {
+    perspective: 1000px;
+    height: 280px;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .flashcard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .flashcard.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-shadow: 0 4px 24px rgba(26,18,8,0.1), 0 1px 4px rgba(26,18,8,0.06);
+  }
+
+  .card-front {
+    background: var(--paper);
+    background-image: 
+      linear-gradient(135deg, rgba(184,134,11,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(200,184,154,0.15) 30px, rgba(200,184,154,0.15) 31px);
+  }
+
+  .card-back {
+    background: var(--ink);
+    background-image: linear-gradient(135deg, rgba(192,57,43,0.12) 0%, transparent 60%);
+    transform: rotateY(180deg);
+    border-color: transparent;
+  }
+
+  .card-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    font-family: 'Noto Serif KR';
+  }
+  .card-back .card-label { color: rgba(245,240,232,0.4); }
+
+  .card-word {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.2;
+  }
+  .card-back .card-word { color: var(--paper); font-size: 2.2rem; }
+
+  .card-hint {
+    margin-top: 0.8rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .card-back .card-hint { color: rgba(245,240,232,0.5); }
+
+  .card-tap-hint {
+    position: absolute;
+    bottom: 1rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+  }
+  .card-back .card-tap-hint { color: rgba(245,240,232,0.4); }
+
+  .fc-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .nav-btn {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--ink);
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nav-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .fc-result-btns {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    justify-content: center;
+  }
+  .result-btn {
+    padding: 0.6rem 1.5rem;
+    border-radius: 6px;
+    border: 1.5px solid;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: 'Noto Sans KR';
+    transition: all 0.2s;
+  }
+  .result-btn.knew { border-color: var(--sage); color: var(--sage); background: transparent; }
+  .result-btn.knew:hover { background: var(--sage); color: white; }
+  .result-btn.didnt { border-color: var(--red); color: var(--red); background: transparent; }
+  .result-btn.didnt:hover { background: var(--red); color: white; }
+
+  .fc-stats {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--ink); }
+  .stat-lbl { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .stat-num.green { color: var(--sage); }
+  .stat-num.red { color: var(--red); }
+
+  /* =================== QUIZ TAB =================== */
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .quiz-card {
+    background: var(--paper);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 16px rgba(26,18,8,0.07);
+  }
+
+  .quiz-q-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+    font-family: 'Noto Serif KR';
+  }
+
+  .quiz-question {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .quiz-direction-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .badge-ko { background: rgba(192,57,43,0.1); color: var(--red); }
+  .badge-en { background: rgba(90,122,90,0.1); color: var(--sage); }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .option-btn {
+    padding: 1rem 1.2rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--paper-dark);
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: 'Noto Sans KR';
+    color: var(--ink);
+    text-align: left;
+    transition: all 0.18s;
+    line-height: 1.3;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--gold); background: rgba(184,134,11,0.05); }
+  .option-btn.correct { background: rgba(90,122,90,0.12); border-color: var(--sage); color: var(--sage); }
+  .option-btn.wrong { background: rgba(192,57,43,0.1); border-color: var(--red); color: var(--red); }
+  .option-btn:disabled { cursor: default; }
+
+  .quiz-feedback {
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: 'Noto Serif KR';
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: rgba(90,122,90,0.1); color: var(--sage); }
+  .quiz-feedback.wrong { background: rgba(192,57,43,0.08); color: var(--red); }
+
+  .quiz-next-btn {
+    display: none;
+    margin: 1rem auto 0;
+    padding: 0.7rem 2rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.05em;
+    transition: background 0.2s;
+  }
+  .quiz-next-btn:hover { background: var(--red); }
+  .quiz-next-btn.show { display: block; }
+
+  .score-display {
+    text-align: center;
+    padding: 2rem;
+    font-family: 'Noto Serif KR';
+  }
+  .score-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    color: var(--red);
+  }
+
+  /* =================== GRAMMAR TAB =================== */
+  .grammar-card {
+    background: var(--paper);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 16px rgba(26,18,8,0.07);
+  }
+
+  .grammar-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: 'Noto Serif KR';
+    margin-bottom: 1rem;
+  }
+  .gb-pif { background: rgba(184,134,11,0.12); color: var(--gold); }
+  .gb-pf  { background: rgba(26,18,8,0.1); color: var(--ink); }
+  .gb-past-inf { background: rgba(90,122,90,0.12); color: var(--sage); }
+  .gb-past-f  { background: rgba(90,122,90,0.18); color: #3a5a3a; }
+  .gb-imp-ses { background: rgba(192,57,43,0.1); color: var(--red); }
+  .gb-imp-sio { background: rgba(192,57,43,0.15); color: #8a1a0b; }
+
+  .grammar-question {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .grammar-verb {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+
+  .grammar-verb-en {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 1.5rem;
+  }
+
+  .grammar-input-wrap {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .grammar-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: 1.3rem;
+    font-family: 'Noto Serif KR', serif;
+    background: var(--paper-dark);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .grammar-input:focus { border-color: var(--gold); }
+  .grammar-input.correct { border-color: var(--sage); background: rgba(90,122,90,0.05); }
+  .grammar-input.wrong { border-color: var(--red); background: rgba(192,57,43,0.05); }
+
+  .check-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR';
+    font-size: 0.85rem;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .check-btn:hover { background: var(--red); }
+
+  .grammar-feedback {
+    font-size: 0.9rem;
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    display: none;
+    font-family: 'Noto Serif KR';
+    margin-bottom: 0.5rem;
+  }
+  .grammar-feedback.show { display: block; }
+  .grammar-feedback.correct { background: rgba(90,122,90,0.1); color: var(--sage); }
+  .grammar-feedback.wrong { background: rgba(192,57,43,0.08); color: var(--red); }
+
+  .grammar-next-btn {
+    display: none;
+    padding: 0.65rem 1.8rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    transition: background 0.2s;
+    margin-top: 0.5rem;
+  }
+  .grammar-next-btn:hover { background: var(--red); }
+  .grammar-next-btn.show { display: block; }
+
+  .form-names {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .form-tag {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.72rem;
+    border-radius: 4px;
+    font-family: 'Noto Serif KR';
+    cursor: pointer;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .form-tag:hover { border-color: var(--gold); color: var(--gold); }
+  .form-tag.selected { border-color: var(--red); color: var(--red); background: rgba(192,57,43,0.06); }
+
+  .grammar-settings {
+    background: var(--paper-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+  .grammar-settings h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .card-word { font-size: 2rem; }
+    .quiz-question { font-size: 1.6rem; }
+    h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>한국어 <span>Practice</span></h1>
+  <div class="subtitle">Module 1 Vocabulary · DFSL</div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('flashcards')"><span class="tab-icon">🃏</span>Flashcards</button>
+  <button class="tab-btn" onclick="showTab('quiz')"><span class="tab-icon">📝</span>Multiple Choice</button>
+  <button class="tab-btn" onclick="showTab('grammar')"><span class="tab-icon">⚙️</span>Conjugation</button>
+</div>
+
+<!-- =================== FLASHCARD PANEL =================== -->
+<div id="panel-flashcards" class="panel active">
+  <div class="fc-controls">
+    <div class="direction-toggle">
+      <button id="dir-ko" class="active" onclick="setDirection('ko')">Korean → English</button>
+      <button id="dir-en" onclick="setDirection('en')">English → Korean</button>
+    </div>
+    <button class="shuffle-btn" onclick="shuffleAndReset()">⇄ Shuffle</button>
+    <span id="fc-known-badge" style="font-size:0.78rem;color:var(--muted);font-family:'Noto Serif KR'"></span>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="fc-progress" style="width:0%"></div></div>
+    <div class="progress-label" id="fc-count">1 / 165</div>
+  </div>
+
+  <div class="flashcard-scene" onclick="flipCard()">
+    <div class="flashcard" id="flashcard">
+      <div class="card-face card-front">
+        <div class="card-label" id="fc-front-label">Korean</div>
+        <div class="card-word" id="fc-front-word">가다</div>
+        <div class="card-hint" id="fc-front-hint"></div>
+        <div class="card-tap-hint">tap to reveal</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-label" id="fc-back-label" style="color:rgba(245,240,232,0.4)">English</div>
+        <div class="card-word" id="fc-back-word">to go</div>
+        <div class="card-hint" id="fc-back-hint"></div>
+        <div class="card-tap-hint">tap to continue</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fc-nav">
+    <button class="nav-btn" onclick="prevCard()">←</button>
+    <button class="nav-btn" onclick="nextCard()">→</button>
+  </div>
+
+  <div class="fc-result-btns" id="fc-result-btns" style="display:none">
+    <button class="result-btn knew" onclick="markKnew()">✓ Got it</button>
+    <button class="result-btn didnt" onclick="markDidnt()">✗ Still learning</button>
+  </div>
+
+  <div class="fc-stats">
+    <div class="stat-item"><div class="stat-num green" id="stat-knew">0</div><div class="stat-lbl">Got it</div></div>
+    <div class="stat-item"><div class="stat-num" id="stat-total">165</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-item"><div class="stat-num red" id="stat-learning">0</div><div class="stat-lbl">Learning</div></div>
+  </div>
+</div>
+
+<!-- =================== QUIZ PANEL =================== -->
+<div id="panel-quiz" class="panel">
+  <div class="quiz-header">
+    <div class="direction-toggle">
+      <button id="qdir-ko" class="active" onclick="setQuizDir('ko')">Korean → English</button>
+      <button id="qdir-en" onclick="setQuizDir('en')">English → Korean</button>
+      <button id="qdir-both" onclick="setQuizDir('both')">Mixed</button>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="quiz-progress" style="width:0%"></div></div>
+    <div class="progress-label" id="quiz-count">Q 1 / 20</div>
+  </div>
+
+  <div class="quiz-card" id="quiz-card">
+    <div class="quiz-q-label">What does this mean?</div>
+    <div id="quiz-direction-badge" class="quiz-direction-badge badge-ko">Korean → English</div>
+    <div class="quiz-question" id="quiz-question">가다</div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="quiz-feedback" id="quiz-feedback"></div>
+    <button class="quiz-next-btn" id="quiz-next-btn" onclick="nextQuizQ()">Next →</button>
+  </div>
+
+  <div id="quiz-score" class="score-display" style="display:none">
+    <div style="font-size:1.1rem;color:var(--muted);margin-bottom:0.5rem;font-family:'Noto Serif KR'">Quiz Complete!</div>
+    <div class="score-big" id="score-big">0/20</div>
+    <div style="color:var(--muted);margin:0.5rem 0 1.5rem;font-family:'Noto Serif KR'" id="score-msg"></div>
+    <button onclick="restartQuiz()" style="padding:0.7rem 2rem;background:var(--ink);color:var(--paper);border:none;border-radius:6px;cursor:pointer;font-family:'Playfair Display',serif;font-size:0.95rem;">Try Again</button>
+  </div>
+</div>
+
+<!-- =================== GRAMMAR PANEL =================== -->
+<div id="panel-grammar" class="panel">
+
+  <div class="grammar-settings">
+    <h3>Practice These Forms</h3>
+    <div class="form-names" id="form-tags">
+      <div class="form-tag selected" data-form="pif" onclick="toggleForm(this)">Polite Informal (아/어요)</div>
+      <div class="form-tag selected" data-form="pf" onclick="toggleForm(this)">Polite Formal (ㅂ/습니다)</div>
+      <div class="form-tag selected" data-form="past_inf" onclick="toggleForm(this)">Past Informal</div>
+      <div class="form-tag selected" data-form="past_f" onclick="toggleForm(this)">Past Formal</div>
+      <div class="form-tag selected" data-form="imp_ses" onclick="toggleForm(this)">Imperative (세요)</div>
+      <div class="form-tag selected" data-form="imp_sio" onclick="toggleForm(this)">Imperative (십시오)</div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="gram-progress" style="width:0%"></div></div>
+    <div class="progress-label" id="gram-count">1 / 33</div>
+  </div>
+
+  <div class="grammar-card">
+    <div id="gram-badge" class="grammar-badge gb-pif">Polite Informal (아/어요)</div>
+    <div class="grammar-question" id="gram-question">What is the <strong>polite informal</strong> present tense of:</div>
+    <div class="grammar-verb" id="gram-verb">가다</div>
+    <div class="grammar-verb-en" id="gram-verb-en">to go</div>
+    <div class="grammar-input-wrap">
+      <input type="text" class="grammar-input" id="gram-input" placeholder="Type your answer..." onkeydown="if(event.key==='Enter')checkGrammar()">
+      <button class="check-btn" onclick="checkGrammar()">Check</button>
+    </div>
+    <div class="grammar-feedback" id="gram-feedback"></div>
+    <button class="grammar-next-btn" id="gram-next-btn" onclick="nextGrammar()">Next →</button>
+  </div>
+
+  <div class="fc-stats">
+    <div class="stat-item"><div class="stat-num green" id="gram-stat-correct">0</div><div class="stat-lbl">Correct</div></div>
+    <div class="stat-item"><div class="stat-num" id="gram-stat-total">0</div><div class="stat-lbl">Answered</div></div>
+    <div class="stat-item"><div class="stat-num red" id="gram-stat-wrong">0</div><div class="stat-lbl">Wrong</div></div>
+  </div>
+</div>
+
+<script>
+// ===== VOCABULARY DATA =====
+const vocab = [
+  {ko:'가다',en:'to go'},{ko:'같이',en:'together'},{ko:'개',en:'classifier for goods'},
+  {ko:'거기',en:'there'},{ko:'건강하다',en:'to be healthy'},{ko:'결혼하다',en:'to marry'},
+  {ko:'고향',en:'hometown'},{ko:'공군',en:'member of the Army, Navy, Air Force'},
+  {ko:'공부하다',en:'to study'},{ko:'공원',en:'park'},{ko:'과',en:'and, with'},
+  {ko:'교실',en:'classroom'},{ko:'국가',en:'country / nation'},{ko:'군인',en:'military member'},
+  {ko:'그리고',en:'and'},{ko:'근처에',en:'nearby'},{ko:'기지',en:'base'},
+  {ko:'나라',en:'country / nation'},{ko:'나이',en:'age'},
+  {ko:'남/동/서/북',en:'east / west / south / north'},
+  {ko:'남동생',en:'younger brother'},{ko:'남자',en:'man, male'},
+  {ko:'남자친구',en:'boyfriend / male friend'},{ko:'남편',en:'husband'},
+  {ko:'누나',en:'elder sister (for a boy)'},{ko:'대',en:'classifier for machinery / vehicles'},
+  {ko:'대사관',en:'embassy'},{ko:'도서관',en:'library'},{ko:'도서실',en:'library'},
+  {ko:'독일',en:'Germany'},{ko:'돌아가시다',en:'to die (honorific)'},
+  {ko:'동생',en:'younger sibling'},{ko:'딸',en:'daughter'},
+  {ko:'마리',en:'classifier for animals'},{ko:'마시다',en:'to drink'},
+  {ko:'만나다',en:'to meet'},{ko:'말하다',en:'to talk, to speak'},
+  {ko:'먹다',en:'to eat'},{ko:'명',en:'classifier for people'},{ko:'몇',en:'how many'},
+  {ko:'모두',en:'all together'},{ko:'문',en:'door'},{ko:'물',en:'water'},
+  {ko:'뭐',en:'what'},{ko:'누구',en:'who'},{ko:'미국',en:'USA'},
+  {ko:'미혼',en:'single'},{ko:'방',en:'room'},{ko:'배우다',en:'to learn'},
+  {ko:'벌써',en:'already'},{ko:'병',en:'classifier for bottles'},
+  {ko:'보다',en:'to see / to watch / to do an exam'},{ko:'부대',en:'unit'},
+  {ko:'부모님',en:'parents'},{ko:'부인',en:'wife'},{ko:'사람',en:'person / people'},
+  {ko:'사령관',en:'CO (Commanding Officer)'},{ko:'사무실',en:'office'},
+  {ko:'사전',en:'dictionary'},{ko:'사촌',en:'cousin'},{ko:'살',en:'classifier for age'},
+  {ko:'살다',en:'to live'},{ko:'삼촌',en:'uncle'},{ko:'생일',en:'birthday'},
+  {ko:'서다',en:'to stand up'},{ko:'서양',en:'the West'},{ko:'서점',en:'bookshop'},
+  {ko:'선생님',en:'teacher'},{ko:'수도',en:'capital city'},
+  {ko:'숙제하다',en:'to do homework'},{ko:'식당',en:'restaurant'},
+  {ko:'실습실',en:'language lab'},{ko:'쓰다',en:'to write'},
+  {ko:'아기',en:'child / baby'},{ko:'아내',en:'wife'},{ko:'아들',en:'son'},
+  {ko:'아메리카',en:'America'},{ko:'아버지 / 아빠',en:'father'},
+  {ko:'아시아',en:'Asia'},{ko:'아이',en:'child / baby'},{ko:'아프리카',en:'Africa'},
+  {ko:'안녕하십니까',en:'Hello / How are you?'},{ko:'앉다',en:'to sit'},
+  {ko:'약속',en:'appointment / promise'},{ko:'어느',en:'which'},
+  {ko:'어디',en:'where'},{ko:'어른',en:'adult'},
+  {ko:'어머니 / 엄마',en:'mother'},{ko:'언니',en:'elder sister (for a girl)'},
+  {ko:'언어',en:'language'},{ko:'없다',en:'there is not'},
+  {ko:'에',en:'to (place particle)'},{ko:'여기',en:'here'},
+  {ko:'여동생',en:'younger sister'},{ko:'여자',en:'woman, female'},
+  {ko:'여자친구',en:'girlfriend / female friend'},{ko:'연필',en:'pencil'},
+  {ko:'영국',en:'England'},{ko:'영어',en:'English'},
+  {ko:'오다',en:'to come'},{ko:'오빠',en:'elder brother (for a girl)'},
+  {ko:'와 / 하고 / 과',en:'and, with'},{ko:'외국',en:'overseas / foreigner'},
+  {ko:'운동하다',en:'to exercise'},{ko:'유럽',en:'Europe'},
+  {ko:'육군',en:'member of the Army, Navy, Air Force'},{ko:'은행',en:'bank'},
+  {ko:'음식',en:'food / dish'},{ko:'의자',en:'chair'},
+  {ko:'이다',en:'to be'},{ko:'이야기하다',en:'to talk'},
+  {ko:'일본',en:'Japan'},{ko:'일하다',en:'to work'},{ko:'읽다',en:'to read'},
+  {ko:'있다',en:'to have / there is'},{ko:'자',en:'ruler'},
+  {ko:'자라다',en:'to grow up'},{ko:'자매',en:'sisters'},
+  {ko:'잔',en:'classifier for cups / glasses'},{ko:'잘',en:'(very) well'},
+  {ko:'잠 자다',en:'to sleep'},{ko:'저기',en:'over there'},
+  {ko:'전화',en:'telephone'},{ko:'전화하다',en:'to make a phone call'},
+  {ko:'조금 / 좀',en:'a little'},{ko:'조카',en:'nephew / niece'},
+  {ko:'좋아하다',en:'to like'},{ko:'주차장',en:'car park'},
+  {ko:'죽다',en:'to die'},{ko:'준비하다',en:'to prepare'},
+  {ko:'중국',en:'China'},{ko:'중동',en:'Middle East'},{ko:'지도',en:'map'},
+  {ko:'직업',en:'job'},{ko:'집',en:'house'},{ko:'쪽',en:'side / direction'},
+  {ko:'책',en:'book'},{ko:'책상',en:'desk'},{ko:'책장',en:'bookshelf'},
+  {ko:'천천히',en:'slowly'},{ko:'청소하다',en:'to clean'},{ko:'친구',en:'friend'},
+  {ko:'친척',en:'relatives'},{ko:'커피숍 / 카페',en:'coffee shop / cafe'},
+  {ko:'컴퓨터',en:'computer'},{ko:'태국',en:'Thailand'},
+  {ko:'태어나다',en:'to be born'},{ko:'프랑스',en:'France'},
+  {ko:'하다',en:'to do / to speak a language'},{ko:'하지만',en:'but'},
+  {ko:'학교',en:'school'},{ko:'학생',en:'student'},{ko:'한국',en:'Korea'},
+  {ko:'한국어',en:'Korean'},{ko:'할머니',en:'grandmother'},
+  {ko:'할아버지',en:'grandfather'},{ko:'해군',en:'member of the Army, Navy, Air Force (Navy)'},
+  {ko:'형',en:'elder brother (for a boy)'},{ko:'형제',en:'brothers'},
+  {ko:'호주',en:'Australia'},{ko:'화장실',en:'toilet'},{ko:'휴게실',en:'lounge room'}
+];
+
+// ===== VERB CONJUGATION DATA =====
+const verbs = [
+  {dict:'가다',en:'to go',stem:'가',pif:'가요',pf:'갑니다',past_inf:'갔어요',past_f:'갔습니다',imp_ses:'가세요',imp_sio:'가십시오'},
+  {dict:'건강하다',en:'to be healthy',stem:'건강하',pif:'건강해요',pf:'건강합니다',past_inf:'건강했어요',past_f:'건강했습니다',imp_ses:'건강하세요',imp_sio:'건강하십시오'},
+  {dict:'결혼하다',en:'to marry',stem:'결혼하',pif:'결혼해요',pf:'결혼합니다',past_inf:'결혼했어요',past_f:'결혼했습니다',imp_ses:'결혼하세요',imp_sio:'결혼하십시오'},
+  {dict:'공부하다',en:'to study',stem:'공부하',pif:'공부해요',pf:'공부합니다',past_inf:'공부했어요',past_f:'공부했습니다',imp_ses:'공부하세요',imp_sio:'공부하십시오'},
+  {dict:'돌아가시다',en:'to die (honorific)',stem:'돌아가시',pif:'돌아가셔요',pf:'돌아가십니다',past_inf:'돌아가셨어요',past_f:'돌아가셨습니다',imp_ses:'돌아가시세요',imp_sio:'돌아가시십시오'},
+  {dict:'마시다',en:'to drink',stem:'마시',pif:'마셔요',pf:'마십니다',past_inf:'마셨어요',past_f:'마셨습니다',imp_ses:'마시세요',imp_sio:'마시십시오'},
+  {dict:'만나다',en:'to meet',stem:'만나',pif:'만나요',pf:'만납니다',past_inf:'만났어요',past_f:'만났습니다',imp_ses:'만나세요',imp_sio:'만나십시오'},
+  {dict:'말하다',en:'to speak / talk',stem:'말하',pif:'말해요',pf:'말합니다',past_inf:'말했어요',past_f:'말했습니다',imp_ses:'말하세요',imp_sio:'말하십시오'},
+  {dict:'먹다',en:'to eat',stem:'먹',pif:'먹어요',pf:'먹습니다',past_inf:'먹었어요',past_f:'먹었습니다',imp_ses:'먹으세요',imp_sio:'먹으십시오'},
+  {dict:'배우다',en:'to learn',stem:'배우',pif:'배워요',pf:'배웁니다',past_inf:'배웠어요',past_f:'배웠습니다',imp_ses:'배우세요',imp_sio:'배우십시오'},
+  {dict:'보다',en:'to see / watch',stem:'보',pif:'봐요',pf:'봅니다',past_inf:'봤어요',past_f:'봤습니다',imp_ses:'보세요',imp_sio:'보십시오'},
+  {dict:'살다',en:'to live',stem:'살',pif:'살아요',pf:'삽니다',past_inf:'살았어요',past_f:'살았습니다',imp_ses:'사세요',imp_sio:'사십시오'},
+  {dict:'서다',en:'to stand up',stem:'서',pif:'서요',pf:'섭니다',past_inf:'섰어요',past_f:'섰습니다',imp_ses:'서세요',imp_sio:'서십시오'},
+  {dict:'숙제하다',en:'to do homework',stem:'숙제하',pif:'숙제해요',pf:'숙제합니다',past_inf:'숙제했어요',past_f:'숙제했습니다',imp_ses:'숙제하세요',imp_sio:'숙제하십시오'},
+  {dict:'쓰다',en:'to write',stem:'쓰',pif:'써요',pf:'씁니다',past_inf:'썼어요',past_f:'썼습니다',imp_ses:'쓰세요',imp_sio:'쓰십시오'},
+  {dict:'앉다',en:'to sit',stem:'앉',pif:'앉아요',pf:'앉습니다',past_inf:'앉았어요',past_f:'앉았습니다',imp_ses:'앉으세요',imp_sio:'앉으십시오'},
+  {dict:'없다',en:'there is not',stem:'없',pif:'없어요',pf:'없습니다',past_inf:'없었어요',past_f:'없었습니다',imp_ses:'없으세요',imp_sio:'없으십시오'},
+  {dict:'오다',en:'to come',stem:'오',pif:'와요',pf:'옵니다',past_inf:'왔어요',past_f:'왔습니다',imp_ses:'오세요',imp_sio:'오십시오'},
+  {dict:'운동하다',en:'to exercise',stem:'운동하',pif:'운동해요',pf:'운동합니다',past_inf:'운동했어요',past_f:'운동했습니다',imp_ses:'운동하세요',imp_sio:'운동하십시오'},
+  {dict:'이다',en:'to be',stem:'이',pif:'이에요 / 예요',pf:'입니다',past_inf:'이었어요 / 였어요',past_f:'이었습니다 / 였습니다',imp_ses:'N/A',imp_sio:'N/A'},
+  {dict:'이야기하다',en:'to talk',stem:'이야기하',pif:'이야기해요',pf:'이야기합니다',past_inf:'이야기했어요',past_f:'이야기했습니다',imp_ses:'이야기하세요',imp_sio:'이야기하십시오'},
+  {dict:'일하다',en:'to work',stem:'일하',pif:'일해요',pf:'일합니다',past_inf:'일했어요',past_f:'일했습니다',imp_ses:'일하세요',imp_sio:'일하십시오'},
+  {dict:'읽다',en:'to read',stem:'읽',pif:'읽어요',pf:'읽습니다',past_inf:'읽었어요',past_f:'읽었습니다',imp_ses:'읽으세요',imp_sio:'읽으십시오'},
+  {dict:'있다',en:'to have / there is',stem:'있',pif:'있어요',pf:'있습니다',past_inf:'있었어요',past_f:'있었습니다',imp_ses:'있으세요',imp_sio:'있으십시오'},
+  {dict:'자라다',en:'to grow up',stem:'자라',pif:'자라요',pf:'자랍니다',past_inf:'자랐어요',past_f:'자랐습니다',imp_ses:'자라세요',imp_sio:'자라십시오'},
+  {dict:'잠 자다',en:'to sleep',stem:'자',pif:'자요',pf:'잡니다',past_inf:'잤어요',past_f:'잤습니다',imp_ses:'자세요',imp_sio:'자십시오'},
+  {dict:'전화하다',en:'to make a phone call',stem:'전화하',pif:'전화해요',pf:'전화합니다',past_inf:'전화했어요',past_f:'전화했습니다',imp_ses:'전화하세요',imp_sio:'전화하십시오'},
+  {dict:'좋아하다',en:'to like',stem:'좋아하',pif:'좋아해요',pf:'좋아합니다',past_inf:'좋아했어요',past_f:'좋아했습니다',imp_ses:'좋아하세요',imp_sio:'좋아하십시오'},
+  {dict:'죽다',en:'to die',stem:'죽',pif:'죽어요',pf:'죽습니다',past_inf:'죽었어요',past_f:'죽었습니다',imp_ses:'죽으세요',imp_sio:'죽으십시오'},
+  {dict:'준비하다',en:'to prepare',stem:'준비하',pif:'준비해요',pf:'준비합니다',past_inf:'준비했어요',past_f:'준비했습니다',imp_ses:'준비하세요',imp_sio:'준비하십시오'},
+  {dict:'청소하다',en:'to clean',stem:'청소하',pif:'청소해요',pf:'청소합니다',past_inf:'청소했어요',past_f:'청소했습니다',imp_ses:'청소하세요',imp_sio:'청소하십시오'},
+  {dict:'태어나다',en:'to be born',stem:'태어나',pif:'태어나요',pf:'태어납니다',past_inf:'태어났어요',past_f:'태어났습니다',imp_ses:'태어나세요',imp_sio:'태어나십시오'},
+  {dict:'하다',en:'to do / to speak a language',stem:'하',pif:'해요',pf:'합니다',past_inf:'했어요',past_f:'했습니다',imp_ses:'하세요',imp_sio:'하십시오'}
+];
+
+const formMeta = {
+  pif:      { label:'Polite Informal (아/어요)', badge:'gb-pif', q:'polite informal (아/어요) present' },
+  pf:       { label:'Polite Formal (ㅂ/습니다)', badge:'gb-pf',  q:'polite formal (ㅂ/습니다) present' },
+  past_inf: { label:'Past Informal',              badge:'gb-past-inf', q:'past tense informal' },
+  past_f:   { label:'Past Formal',                badge:'gb-past-f',   q:'past tense formal' },
+  imp_ses:  { label:'Imperative (세요)',           badge:'gb-imp-ses',  q:'formal imperative (세요)' },
+  imp_sio:  { label:'Imperative (십시오)',         badge:'gb-imp-sio',  q:'formal imperative (십시오)' }
+};
+
+// ===== UTILS =====
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== TAB =====
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ===== FLASHCARD STATE =====
+let fcDeck = shuffle([...vocab]);
+let fcIdx = 0;
+let fcDirection = 'ko'; // 'ko' = show korean, answer english
+let fcFlipped = false;
+let fcKnew = 0;
+let fcLearning = 0;
+let fcMarked = new Set();
+
+function setDirection(dir) {
+  fcDirection = dir;
+  document.getElementById('dir-ko').classList.toggle('active', dir === 'ko');
+  document.getElementById('dir-en').classList.toggle('active', dir === 'en');
+  fcFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fc-result-btns').style.display = 'none';
+  renderFC();
+}
+
+function shuffleAndReset() {
+  fcDeck = shuffle([...vocab]);
+  fcIdx = 0;
+  fcFlipped = false;
+  fcKnew = 0;
+  fcLearning = 0;
+  fcMarked = new Set();
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fc-result-btns').style.display = 'none';
+  document.getElementById('stat-knew').textContent = 0;
+  document.getElementById('stat-learning').textContent = 0;
+  renderFC();
+}
+
+function renderFC() {
+  const card = fcDeck[fcIdx];
+  const frontWord = fcDirection === 'ko' ? card.ko : card.en;
+  const backWord  = fcDirection === 'ko' ? card.en : card.ko;
+  const frontLbl  = fcDirection === 'ko' ? '한국어' : 'English';
+  const backLbl   = fcDirection === 'ko' ? 'English' : '한국어';
+
+  document.getElementById('fc-front-label').textContent = frontLbl;
+  document.getElementById('fc-back-label').textContent  = backLbl;
+  document.getElementById('fc-front-word').textContent  = frontWord;
+  document.getElementById('fc-back-word').textContent   = backWord;
+
+  // Update progress
+  const pct = Math.round(((fcIdx + 1) / fcDeck.length) * 100);
+  document.getElementById('fc-progress').style.width = pct + '%';
+  document.getElementById('fc-count').textContent = (fcIdx + 1) + ' / ' + fcDeck.length;
+  document.getElementById('stat-total').textContent = fcDeck.length;
+}
+
+function flipCard() {
+  const card = document.getElementById('flashcard');
+  if (!fcFlipped) {
+    card.classList.add('flipped');
+    fcFlipped = true;
+    document.getElementById('fc-result-btns').style.display = 'flex';
+  } else {
+    nextCard();
+  }
+}
+
+function nextCard() {
+  if (fcIdx < fcDeck.length - 1) {
+    fcIdx++;
+    fcFlipped = false;
+    document.getElementById('flashcard').classList.remove('flipped');
+    document.getElementById('fc-result-btns').style.display = 'none';
+    renderFC();
+  }
+}
+
+function prevCard() {
+  if (fcIdx > 0) {
+    fcIdx--;
+    fcFlipped = false;
+    document.getElementById('flashcard').classList.remove('flipped');
+    document.getElementById('fc-result-btns').style.display = 'none';
+    renderFC();
+  }
+}
+
+function markKnew() {
+  if (!fcMarked.has(fcIdx)) {
+    fcMarked.add(fcIdx);
+    fcKnew++;
+    document.getElementById('stat-knew').textContent = fcKnew;
+  }
+  nextCard();
+}
+
+function markDidnt() {
+  if (!fcMarked.has(fcIdx)) {
+    fcMarked.add(fcIdx);
+    fcLearning++;
+    document.getElementById('stat-learning').textContent = fcLearning;
+  }
+  nextCard();
+}
+
+// ===== QUIZ STATE =====
+const QUIZ_LEN = 20;
+let quizDeck = [];
+let quizIdx = 0;
+let quizScore = 0;
+let quizDir = 'ko';
+let quizAnswered = false;
+
+function setQuizDir(dir) {
+  quizDir = dir;
+  ['ko','en','both'].forEach(d => {
+    document.getElementById('qdir-' + d).classList.toggle('active', d === dir);
+  });
+  restartQuiz();
+}
+
+function restartQuiz() {
+  quizDeck = shuffle([...vocab]).slice(0, QUIZ_LEN);
+  quizIdx = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  document.getElementById('quiz-card').style.display = 'block';
+  document.getElementById('quiz-score').style.display = 'none';
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const item = quizDeck[quizIdx];
+  // Decide direction
+  let showKo;
+  if (quizDir === 'ko') showKo = true;
+  else if (quizDir === 'en') showKo = false;
+  else showKo = Math.random() < 0.5;
+
+  const question = showKo ? item.ko : item.en;
+  const correct  = showKo ? item.en : item.ko;
+  const badgeClass = showKo ? 'badge-ko' : 'badge-en';
+  const badgeText  = showKo ? 'Korean → English' : 'English → Korean';
+
+  document.getElementById('quiz-question').textContent = question;
+  const badge = document.getElementById('quiz-direction-badge');
+  badge.textContent = badgeText;
+  badge.className = 'quiz-direction-badge ' + badgeClass;
+
+  // Build wrong options from rest of vocab
+  const wrongPool = vocab.filter(v => v !== item);
+  const wrongs = shuffle(wrongPool).slice(0, 3).map(v => showKo ? v.en : v.ko);
+  const options = shuffle([correct, ...wrongs]);
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectQuizAnswer(btn, opt, correct);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('quiz-feedback').className = 'quiz-feedback';
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-next-btn').className = 'quiz-next-btn';
+  quizAnswered = false;
+
+  const pct = Math.round((quizIdx / QUIZ_LEN) * 100);
+  document.getElementById('quiz-progress').style.width = pct + '%';
+  document.getElementById('quiz-count').textContent = 'Q ' + (quizIdx + 1) + ' / ' + QUIZ_LEN;
+}
+
+function selectQuizAnswer(btn, chosen, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+
+  const isCorrect = chosen === correct;
+  const allBtns = document.querySelectorAll('.option-btn');
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correct) b.classList.add('correct');
+  });
+  if (!isCorrect) {
+    btn.classList.add('wrong');
+  } else {
+    quizScore++;
+  }
+
+  const fb = document.getElementById('quiz-feedback');
+  fb.textContent = isCorrect ? '✓ Correct!' : '✗ The answer was: ' + correct;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct' : 'wrong');
+
+  document.getElementById('quiz-next-btn').className = 'quiz-next-btn show';
+}
+
+function nextQuizQ() {
+  quizIdx++;
+  if (quizIdx >= QUIZ_LEN) {
+    document.getElementById('quiz-card').style.display = 'none';
+    document.getElementById('quiz-score').style.display = 'block';
+    document.getElementById('score-big').textContent = quizScore + ' / ' + QUIZ_LEN;
+    const pct = Math.round((quizScore / QUIZ_LEN) * 100);
+    let msg = pct >= 90 ? '🌟 Outstanding!' : pct >= 70 ? '👍 Great work!' : pct >= 50 ? '📚 Keep studying!' : '💪 더 열심히 하세요!';
+    document.getElementById('score-msg').textContent = msg;
+    document.getElementById('quiz-progress').style.width = '100%';
+    return;
+  }
+  renderQuiz();
+}
+
+// ===== GRAMMAR STATE =====
+let gramDeck = [];
+let gramIdx = 0;
+let gramCorrect = 0;
+let gramWrong = 0;
+let gramAnswered = false;
+let activeForms = new Set(['pif','pf','past_inf','past_f','imp_ses','imp_sio']);
+
+function toggleForm(el) {
+  const form = el.dataset.form;
+  if (activeForms.has(form)) {
+    if (activeForms.size > 1) {
+      activeForms.delete(form);
+      el.classList.remove('selected');
+    }
+  } else {
+    activeForms.add(form);
+    el.classList.add('selected');
+  }
+  buildGramDeck();
+  gramIdx = 0;
+  gramAnswered = false;
+  renderGrammar();
+}
+
+function buildGramDeck() {
+  gramDeck = [];
+  const forms = [...activeForms];
+  shuffle([...verbs]).forEach(v => {
+    forms.forEach(f => {
+      if (v[f] !== 'N/A') {
+        gramDeck.push({ verb: v, form: f });
+      }
+    });
+  });
+  gramDeck = shuffle(gramDeck);
+}
+
+function renderGrammar() {
+  if (gramDeck.length === 0) return;
+  const item = gramDeck[gramIdx % gramDeck.length];
+  const meta = formMeta[item.form];
+
+  document.getElementById('gram-verb').textContent = item.verb.dict;
+  document.getElementById('gram-verb-en').textContent = item.verb.en;
+  document.getElementById('gram-question').innerHTML = 'What is the <strong>' + meta.label + '</strong> form of:';
+
+  const badge = document.getElementById('gram-badge');
+  badge.textContent = meta.label;
+  badge.className = 'grammar-badge ' + meta.badge;
+
+  const inp = document.getElementById('gram-input');
+  inp.value = '';
+  inp.className = 'grammar-input';
+  inp.disabled = false;
+  inp.focus();
+
+  document.getElementById('gram-feedback').className = 'grammar-feedback';
+  document.getElementById('gram-next-btn').className = 'grammar-next-btn';
+  gramAnswered = false;
+
+  const total = gramDeck.length;
+  const pct = Math.round(((gramIdx % total) / total) * 100);
+  document.getElementById('gram-progress').style.width = pct + '%';
+  document.getElementById('gram-count').textContent = (gramIdx + 1) + ' / ' + total;
+}
+
+function checkGrammar() {
+  if (gramAnswered) return;
+  const item = gramDeck[gramIdx % gramDeck.length];
+  const correct = item.verb[item.form];
+  const userAnswer = document.getElementById('gram-input').value.trim();
+
+  if (!userAnswer) return;
+  gramAnswered = true;
+
+  // Accept multiple valid answers (split by /)
+  const validAnswers = correct.split('/').map(s => s.trim().toLowerCase());
+  const isCorrect = validAnswers.includes(userAnswer.trim().toLowerCase());
+
+  const inp = document.getElementById('gram-input');
+  inp.disabled = true;
+  inp.className = 'grammar-input ' + (isCorrect ? 'correct' : 'wrong');
+
+  const fb = document.getElementById('gram-feedback');
+  fb.className = 'grammar-feedback show ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✓ Correct! ' + correct : '✗ The answer is: ' + correct;
+
+  if (isCorrect) {
+    gramCorrect++;
+    document.getElementById('gram-stat-correct').textContent = gramCorrect;
+  } else {
+    gramWrong++;
+    document.getElementById('gram-stat-wrong').textContent = gramWrong;
+  }
+  document.getElementById('gram-stat-total').textContent = gramCorrect + gramWrong;
+
+  document.getElementById('gram-next-btn').className = 'grammar-next-btn show';
+}
+
+function nextGrammar() {
+  gramIdx++;
+  if (gramIdx >= gramDeck.length) {
+    // Reshuffle for endless practice
+    buildGramDeck();
+    gramIdx = 0;
+  }
+  renderGrammar();
+}
+
+// ===== INIT =====
+renderFC();
+restartQuiz();
+buildGramDeck();
+renderGrammar();
+</script>
+</body>
+</html>
