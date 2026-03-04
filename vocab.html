@@ -198,6 +198,7 @@
   }
 
   .flashcard.flipped { transform: rotateY(180deg); }
+  .flashcard.no-transition { transition: none !important; }
 
   .card-face {
     position: absolute;
@@ -628,6 +629,7 @@
     .panel { padding: 1.5rem 1rem 5rem; }
     .direction-toggle button { padding: 0.6rem 0.9rem; min-height: 40px; }
   }
+
 </style>
 </head>
 <body>
@@ -931,8 +933,7 @@ function setDirection(dir) {
   card.classList.remove('flipped');
   document.getElementById('fc-result-btns').style.display = 'none';
   // Clear back face immediately so it can't be glimpsed
-  document.getElementById('fc-back-word').textContent = '';
-  setTimeout(renderFC, 560);
+  advanceCard();
 }
 
 function shuffleAndReset() {
@@ -946,8 +947,7 @@ function shuffleAndReset() {
   document.getElementById('fc-result-btns').style.display = 'none';
   document.getElementById('stat-knew').textContent = 0;
   document.getElementById('stat-learning').textContent = 0;
-  document.getElementById('fc-back-word').textContent = '';
-  setTimeout(renderFC, 560);
+  advanceCard();
 }
 
 function renderFC() {
@@ -985,27 +985,38 @@ function flipCard() {
   }
 }
 
+// Instantly reset card to front face with no visible animation, then load new content
+function advanceCard() {
+  const card = document.getElementById('flashcard');
+  fcFlipped = false;
+  document.getElementById('fc-result-btns').style.display = 'none';
+
+  // Disable transition, snap back to front instantly
+  card.classList.add('no-transition');
+  card.classList.remove('flipped');
+
+  // Update content immediately while card is snapping (invisible)
+  renderFC();
+
+  // Re-enable transition on next frame so the next flip animates normally
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      card.classList.remove('no-transition');
+    });
+  });
+}
+
 function nextCard() {
   if (fcIdx < fcDeck.length - 1) {
     fcIdx++;
-    fcFlipped = false;
-    const card = document.getElementById('flashcard');
-    card.classList.remove('flipped');
-    document.getElementById('fc-result-btns').style.display = 'none';
-    // Blank the back face immediately, then update content after flip-back animation
-    document.getElementById('fc-back-word').textContent = '';
-    setTimeout(renderFC, 560);
+    advanceCard();
   }
 }
 
 function prevCard() {
   if (fcIdx > 0) {
     fcIdx--;
-    fcFlipped = false;
-    document.getElementById('flashcard').classList.remove('flipped');
-    document.getElementById('fc-result-btns').style.display = 'none';
-    document.getElementById('fc-back-word').textContent = '';
-    setTimeout(renderFC, 560);
+    advanceCard();
   }
 }
 
@@ -1244,11 +1255,14 @@ function nextGrammar() {
   renderGrammar();
 }
 
+
+
 // ===== INIT =====
 renderFC();
 restartQuiz();
 buildGramDeck();
 renderGrammar();
 </script>
+
 </body>
 </html>

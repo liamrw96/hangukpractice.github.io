@@ -139,6 +139,10 @@
     background: linear-gradient(135deg, rgba(90,122,90,0.05), rgba(184,134,11,0.04));
   }
 
+  .study-card.dict::before {
+    background: linear-gradient(135deg, rgba(26,18,8,0.04), rgba(184,134,11,0.05));
+  }
+
   .study-card:hover {
     transform: translateY(-3px);
     border-color: var(--gold);
@@ -262,11 +266,12 @@
         <div class="card-icon">🃏</div>
         <div class="card-text">
           <div class="card-title">Vocabulary Practice</div>
-          <div class="card-subtitle">165 words · flashcards, multiple choice & verb conjugation</div>
+          <div class="card-subtitle">173 words · flashcards, multiple choice &amp; verb conjugation</div>
           <div class="card-pills">
             <span class="pill pill-red">Flashcards</span>
             <span class="pill pill-gold">Quiz</span>
             <span class="pill pill-sage">Conjugation</span>
+            <span class="pill pill-gold">Mixed Mode</span>
           </div>
         </div>
         <div class="card-arrow">→</div>
@@ -283,6 +288,22 @@
             <span class="pill pill-sage">Sino-Korean</span>
             <span class="pill pill-gold">Native Korean</span>
             <span class="pill pill-red">Quiz</span>
+          </div>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <a href="dictionary.html" class="study-card dict">
+      <div class="card-inner">
+        <div class="card-icon">📖</div>
+        <div class="card-text">
+          <div class="card-title">Korean Dictionary</div>
+          <div class="card-subtitle">5,709 TOPIK words · search, sort &amp; filter by word type</div>
+          <div class="card-pills">
+            <span class="pill pill-red">Korean → English</span>
+            <span class="pill pill-gold">English → Korean</span>
+            <span class="pill pill-sage">5,709 words</span>
           </div>
         </div>
         <div class="card-arrow">→</div>
